@@ -1,5 +1,7 @@
 # Real-Time Voice AI
 
+![Terminal Demo](demo.gif)
+
 A low-latency, conversational voice AI system.
 
 ## Tech Stack
@@ -24,6 +26,8 @@ This project is deployed as a serverless backend on Vercel. You can test the API
 
 ```bash
 # Example Request
+
+![Terminal Demo](demo.gif)
 curl -X GET https://realtime-voice-2b7vo4vtx-dev4aibots.vercel.app/api/health
 ```
 
