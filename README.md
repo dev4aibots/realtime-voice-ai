@@ -8,12 +8,12 @@
 
 > **A low-latency, conversational voice AI system leveraging WebSockets for instant ASR to LLM to TTS streaming.**
 
-## 🌟 Key Features
-- ✅ **WebSocket-based duplex communication**
-- ✅ **Sub-500ms voice-to-voice latency**
-- ✅ **Interruption and vad (voice activity detection) handling**
+## Key Features
+- **WebSocket-based duplex communication**
+- **Sub-500ms voice-to-voice latency**
+- **Interruption and vad (voice activity detection) handling**
 
-## 🏗️ Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -23,7 +23,7 @@ flowchart LR
     D -->|Audio Stream| A
 ```
 
-## 🚀 Live API Endpoint (Vercel)
+## Live API Endpoint (Vercel)
 
 This project is deployed serverless via Vercel Edge Functions. You can test the interaction directly from your terminal.
 
@@ -32,7 +32,7 @@ This project is deployed serverless via Vercel Edge Functions. You can test the 
 curl -X GET https://realtime-voice-2b7vo4vtx-dev4aibots.vercel.app/api/health
 ```
 
-## 💻 Developer Quickstart
+## Developer Quickstart
 
 ### Prerequisites
 - Python 3.11+
@@ -64,7 +64,7 @@ curl -X GET https://realtime-voice-2b7vo4vtx-dev4aibots.vercel.app/api/health
    npm run dev
    ```
 
-## 📁 Project Structure
+## Project Structure
 ```
 .
 ├── api/                  # Vercel serverless endpoints
@@ -75,5 +75,5 @@ curl -X GET https://realtime-voice-2b7vo4vtx-dev4aibots.vercel.app/api/health
 └── vercel.json           # Vercel routing configuration
 ```
 
-## 📄 License
+## License
 This project is licensed under the MIT License.
