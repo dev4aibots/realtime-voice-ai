@@ -1,5 +1,9 @@
 # Realtime Voice AI
 
+> 🧪 **Learning build** — a course/tutorial project for studying real-time voice AI pipelines. Not a production system.
+
+> **Status:** Reference / learning code. The scaffold runs locally for experimentation; it is not deployed, has no production users, and has not been hardened for production use.
+
 Low-latency conversational voice AI leveraging WebSockets for duplex ASR-to-LLM-to-TTS streaming.
 
 [ Demo ] [ Architecture ] [ API Docs ] [ Evaluation ]
@@ -9,7 +13,7 @@ Low-latency conversational voice AI leveraging WebSockets for duplex ASR-to-LLM-
 Python • WebSockets • Whisper • ElevenLabs • VAD
 
 ## What it does
-Low-latency conversational voice AI leveraging WebSockets for duplex ASR-to-LLM-to-TTS streaming. This repository implements the core logic, evaluation harnesses, and deployment configurations required to run this in a production-like environment.
+Low-latency conversational voice AI leveraging WebSockets for duplex ASR-to-LLM-to-TTS streaming. This repository is a learning scaffold — core logic, evaluation harnesses, and example configs for study and experimentation, not hardened for production use.
 
 ## Execution Trace (Proof of Work)
 
