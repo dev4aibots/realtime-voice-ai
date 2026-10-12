@@ -8,10 +8,10 @@
 //
 // Real-time delivery (adaptation c): the original server emitted frames as
 // fast as the loop ran (no wall-clock relation). Here each frame is delivered
-// on its simulated schedule — 1 simulated ms = 1/speed wall-clock ms — so the
+// on its simulated schedule, 1 simulated ms = 1/speed wall-clock ms, so the
 // UI timeline animates truthfully. Simulation itself is instant and
 // deterministic (verbatim runSession); only delivery is paced.
-// SIMULATION: everything generated is synthetic — no mic, no real ASR/LLM/TTS.
+// SIMULATION: everything generated is synthetic, no mic, no real ASR/LLM/TTS.
 
 import type { AudioChunk, SessionSummary, StreamParams } from "./types.ts";
 import { runSession, summarize } from "./orchestrator.ts";

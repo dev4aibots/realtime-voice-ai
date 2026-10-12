@@ -1,7 +1,7 @@
 // Frame protocol ported from dev4aibots/realtime-voice-ai src/protocol.ts.
 // ADAPTATION: the original used zod (EventFrame / SummaryFrame / Frame,
 // encodeFrame, decodeFrame). For the browser bundle this port re-implements
-// the SAME validation by hand — zero dependencies — replicating zod's
+// the SAME validation by hand, zero dependencies, replicating zod's
 // semantics exactly: required fields, literal `type` discrimination,
 // per-field type checks, and stripping of unknown keys (z.object default).
 // The wire shape {type:"event",line} / {type:"summary",...} is unchanged, so

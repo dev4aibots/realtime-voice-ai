@@ -46,7 +46,7 @@ export type CustomConfig = {
  */
 function stateForLine(line: string): PipelineState | null {
   // BUG-10: the engine log no longer has a colon ("BARGE-IN cancel TTS…"),
-  // so match the bare token — /BARGE-IN:/ would never match and the
+  // so match the bare token, /BARGE-IN:/ would never match and the
   // re-armed LISTENING transition would be lost.
   if (/BARGE-IN/.test(line)) return "LISTENING";
   if (/LLM first token/.test(line)) return "SPEAKING";
@@ -69,7 +69,7 @@ function transcriptForLine(
   simMs: number,
   toolResult: string | null,
 ): Omit<TranscriptLine, "id" | "streaming"> | null {
-  // Transcript is built from VERBATIM frame content only — nothing invented.
+  // Transcript is built from VERBATIM frame content only, nothing invented.
   let m = /TURN COMPLETE \(score=[\d.]+\) partial='(.*)'/.exec(line);
   if (m) return { role: "user", text: m[1], simMs };
   m = /filler '(.*)'/.exec(line);
@@ -79,7 +79,7 @@ function transcriptForLine(
   if (/TTS first audio-out/.test(line)) {
     // BUG-9: "(assistant speaking)" was a static placeholder. The engine
     // never scripts the reply text, so the only verbatim spoken content
-    // available is the tool result the assistant just fetched — quote it.
+    // available is the tool result the assistant just fetched, quote it.
     // With no tool result there is nothing verbatim to quote; say so
     // honestly instead of inventing a reply.
     if (toolResult) return { role: "assistant", text: `\u201c${toolResult}\u201d`, simMs };
@@ -111,7 +111,7 @@ export function useSession() {
   const runId = useRef(0);
   const timerRef = useRef<number | null>(null);
   const lastEventId = useRef(-1);
-  // Latest verbatim tool result in this run — quoted as the assistant's
+  // Latest verbatim tool result in this run, quoted as the assistant's
   // spoken line at TTS first audio-out (BUG-9). Reset on every start.
   const toolResultRef = useRef<string | null>(null);
 
@@ -147,7 +147,7 @@ export function useSession() {
       // (customConfigForPreset), computed synchronously so ?autostart= and
       // programmatic starts can never run stale panel state.
       // BUG-7: the barge-in slider (bargeInMs) IS the barge-in schedule for
-      // every preset — >0 interrupts at that exact ms (the engine injects
+      // every preset, >0 interrupts at that exact ms (the engine injects
       // speech there), 0 suppresses barge-in entirely.
       const cfg = active === "custom" ? custom : customConfigForPreset(active);
       const params: StreamParams = {

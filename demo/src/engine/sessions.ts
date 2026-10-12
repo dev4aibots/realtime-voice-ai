@@ -2,13 +2,13 @@
 // The original hard-coded two sessions; here they are data (SessionDefinition)
 // plus a parameterized runner. All constants, scripts, and the barge-in frame
 // injection below are verbatim from the original index.ts. Everything simulated
-// stays labeled as simulation (the whole engine is synthetic — see vad.ts).
+// stays labeled as simulation (the whole engine is synthetic, see vad.ts).
 
 import type { AudioChunk, SessionDefinition, SessionSummary, StreamParams } from "./types.ts";
 import { runSession, summarize } from "./orchestrator.ts";
 import { synthCall } from "./vad.ts";
 
-/** Session 1 — clean call with tool use (original index.ts: useTool: true, bargeInAtMs: null). */
+/** Session 1, clean call with tool use (original index.ts: useTool: true, bargeInAtMs: null). */
 export const SESSION_CLEAN: SessionDefinition = {
   id: "clean-call",
   label: "session 1: clean call with tool (weather)",
@@ -20,7 +20,7 @@ export const SESSION_CLEAN: SessionDefinition = {
 
 export const SESSION_CLEAN_SCRIPT = SESSION_CLEAN.script;
 
-/** Session 2 — barge-in mid-response (original index.ts logic, see below). */
+/** Session 2, barge-in mid-response (original index.ts logic, see below). */
 export const SESSION_BARGE_IN: SessionDefinition = {
   id: "barge-in",
   label: "session 2: user barges in mid-response",
@@ -66,7 +66,7 @@ function bargeInInjectStart(frames: AudioChunk[], atMs: number): number {
 }
 
 /**
- * BUG-7 fix — explicit barge-in time override (the Configure slider).
+ * BUG-7 fix, explicit barge-in time override (the Configure slider).
  * Same 8-frame speech injection as the original trick, but anchored at the
  * requested time instead of the scripted anchor. Returns the frame's tMs —
  * the exact time the BARGE-IN event fires (the engine fires at the first
@@ -88,7 +88,7 @@ export function injectBargeInSpeechAt(frames: AudioChunk[], atMs: number): numbe
 
 /**
  * The scripted interruption point for a script: the tMs of the anchor frame
- * (frames.length - 20) — the time the BARGE-IN event is observed at under the
+ * (frames.length - 20), the time the BARGE-IN event is observed at under the
  * original index.ts anchor math. Computed from the same values the engine
  * uses (never a duplicated formula in the UI).
  */
@@ -123,7 +123,7 @@ export function maxBargeInMs(script: string): number {
  * bargeInAtMs with injectBargeInFrames falls back to the legacy scripted
  * anchor (verbatim original behavior, kept for parity); otherwise there is
  * no barge-in. Previously the explicit override was silently overwritten by
- * the scripted anchor — the slider had no effect.
+ * the scripted anchor, the slider had no effect.
  */
 export function resolveBargeIn(
   frames: AudioChunk[],
@@ -137,7 +137,7 @@ export function resolveBargeIn(
 }
 
 /**
- * BUG-8 fix — the Configure panel values a preset stands for, so selecting a
+ * BUG-8 fix, the Configure panel values a preset stands for, so selecting a
  * preset syncs the panel instead of leaving stale custom values. The barge-in
  * preset seeds the slider with the real scripted fire time, which reproduces
  * the original session-2 timeline exactly through the override path.
@@ -165,7 +165,7 @@ export function buildSessionFrames(def: SessionDefinition): { frames: AudioChunk
   return { frames, bargeInAtMs };
 }
 
-/** Parameterized synchronous runner — same call signature semantics as index.ts's inline runs. */
+/** Parameterized synchronous runner, same call signature semantics as index.ts's inline runs. */
 export function runSessionSync(params: StreamParams): { summary: SessionSummary; events: string[] } {
   const frames = synthCall(params.script);
   // BUG-7: an explicit bargeInAtMs override is honored (injected at that
