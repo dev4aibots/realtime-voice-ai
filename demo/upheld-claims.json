@@ -1,0 +1,54 @@
+{
+  "claims": [
+    {
+      "type": "tests_pass",
+      "id": "engine-parity",
+      "cmd": "bash /home/hatch/workspace/demos/realtime-voice-ai/run-gate.sh bash -c 'cd /home/hatch/workspace/demos/realtime-voice-ai/src/engine && node --experimental-strip-types parity.test.mjs'"
+    },
+    {
+      "type": "tests_pass",
+      "id": "bugfix-verify",
+      "cmd": "bash /home/hatch/workspace/demos/realtime-voice-ai/run-gate.sh bash -c 'cd /home/hatch/workspace/demos/realtime-voice-ai/src/engine && node --experimental-strip-types fix-verify.mjs'"
+    },
+    {
+      "type": "tests_pass",
+      "id": "github-demo-pushed",
+      "cmd": "bash /home/hatch/workspace/demos/realtime-voice-ai/run-gate.sh python3 /tmp/check_demo_entries.py"
+    },
+    {
+      "type": "tests_pass",
+      "id": "anti-slop-gate",
+      "cmd": "bash /home/hatch/workspace/demos/realtime-voice-ai/run-gate.sh bash -c 'rm -rf /tmp/_slop && mkdir -p /tmp/_slop && cp -r /home/hatch/workspace/demos/realtime-voice-ai/app/src /home/hatch/workspace/demos/realtime-voice-ai/app/index.html /home/hatch/workspace/demos/realtime-voice-ai/app/public /tmp/_slop/ && /home/hatch/workspace/demos/design-overhaul/research/tooling/anti-slop-check.sh /tmp/_slop'"
+    },
+    {
+      "type": "tests_pass",
+      "id": "stylelint-gate",
+      "cmd": "bash /home/hatch/workspace/demos/realtime-voice-ai/run-gate.sh bash -c 'cd /home/hatch/workspace/demos/realtime-voice-ai/app && npx -y stylelint@16 \"src/**/*.css\"'"
+    },
+    {
+      "type": "tests_pass",
+      "id": "contrast-gate",
+      "cmd": "bash /home/hatch/workspace/demos/realtime-voice-ai/run-gate.sh bash -c 'cd /tmp && for fg in ffffff b3b3b3 000000 1db954; do :; done; npx -y @siluat/color-contrast-cli \"#ffffff\" \"#121212\" --level AA && npx -y @siluat/color-contrast-cli \"#b3b3b3\" \"#121212\" --level AA && npx -y @siluat/color-contrast-cli \"#000000\" \"#1db954\" --level AA && npx -y @siluat/color-contrast-cli \"#1db954\" \"#121212\" --level AA && npx -y @siluat/color-contrast-cli \"#b3b3b3\" \"#181818\" --level AA && npx -y @siluat/color-contrast-cli \"#ffffff\" \"#282828\" --level AA'"
+    },
+    {
+      "type": "tests_pass",
+      "id": "tailwind-a11y-gate",
+      "cmd": "bash /home/hatch/workspace/demos/realtime-voice-ai/run-gate.sh bash -c \"cd /home/hatch/workspace/demos/realtime-voice-ai/app && npx -y tailwind-a11y 'src/**/*.tsx'\""
+    },
+    {
+      "type": "tests_pass",
+      "id": "oxlint-gate",
+      "cmd": "bash /home/hatch/workspace/demos/realtime-voice-ai/run-gate.sh bash -c 'cd /home/hatch/workspace/demos/realtime-voice-ai/app && npm run lint'"
+    },
+    {
+      "type": "tests_pass",
+      "id": "build-gate",
+      "cmd": "bash /home/hatch/workspace/demos/realtime-voice-ai/run-gate.sh bash -c 'cd /home/hatch/workspace/demos/realtime-voice-ai/app && npm run build > /tmp/_build.log 2>&1 && grep -q \"built in\" /tmp/_build.log'"
+    },
+    {
+      "type": "tests_pass",
+      "id": "deploy-staged-402",
+      "cmd": "bash /home/hatch/workspace/demos/realtime-voice-ai/run-gate.sh bash -c \"grep -q api-deployments-free-per-day /home/hatch/workspace/demos/realtime-voice-ai/STAGED-DEPLOY.md && grep -q '\"vite\"' /home/hatch/workspace/demos/realtime-voice-ai/STAGED-DEPLOY.md\""
+    }
+  ]
+}
