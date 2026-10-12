@@ -16,7 +16,7 @@
 import type { AudioChunk, SessionSummary, StreamParams } from "./types.ts";
 import { runSession, summarize } from "./orchestrator.ts";
 import { synthCall } from "./vad.ts";
-import { injectBargeInSpeech } from "./sessions.ts";
+import { resolveBargeIn } from "./sessions.ts";
 import { encodeFrame, decodeFrame } from "./protocol.ts";
 import type { Frame } from "./protocol.ts";
 
@@ -29,10 +29,9 @@ type TimedFrame = { frame: Frame; atSimMs: number };
 
 function buildTimedFrames(params: StreamParams): { timed: TimedFrame[]; summary: SessionSummary } {
   const frames: AudioChunk[] = synthCall(params.script);
-  let bargeInAtMs = params.bargeInAtMs;
-  if (params.injectBargeInFrames) {
-    bargeInAtMs = injectBargeInSpeech(frames);
-  }
+  // BUG-7: an explicit bargeInAtMs override is honored (injected at that
+  // time); it is no longer overwritten by the scripted anchor.
+  const bargeInAtMs = resolveBargeIn(frames, params);
   const m = runSession(frames, {
     useTool: params.useTool,
     bargeInAtMs,

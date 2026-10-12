@@ -9,6 +9,7 @@ import { Waveform } from "./components/Waveform.tsx";
 import { ConfigPanel } from "./components/ConfigPanel.tsx";
 import { TransportBar } from "./components/TransportBar.tsx";
 import { Footer } from "./components/Footer.tsx";
+import { customConfigForPreset } from "./engine/sessions.ts";
 
 /**
  * realtime-voice-ai demo — Spotify-exact, single page.
@@ -39,6 +40,9 @@ export default function App() {
 
   const handlePreset = (p: SessionPreset) => {
     session.setPreset(p);
+    // BUG-8: the Configure panel must show the values the next run will
+    // actually use — sync it from the preset (Custom keeps the user's edits).
+    if (p !== "custom") session.setCustom(customConfigForPreset(p));
     session.reset();
   };
 

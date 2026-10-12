@@ -5,7 +5,7 @@ import {
   type SessionSummary,
   type StreamParams,
 } from "../engine/index.ts";
-import { SESSION_CLEAN, SESSION_BARGE_IN } from "../engine/sessions.ts";
+import { customConfigForPreset } from "../engine/sessions.ts";
 
 export type PipelineState = "IDLE" | "LISTENING" | "WAITING" | "THINKING" | "SPEAKING" | "DONE";
 
@@ -31,21 +31,6 @@ export type TranscriptLine = {
   streaming: boolean;
 };
 
-const PRESET_PARAMS: Record<"clean" | "barge-in", StreamParams> = {
-  clean: {
-    script: SESSION_CLEAN.script,
-    useTool: SESSION_CLEAN.useTool,
-    bargeInAtMs: SESSION_CLEAN.bargeInAtMs,
-    injectBargeInFrames: SESSION_CLEAN.injectBargeInFrames,
-  },
-  "barge-in": {
-    script: SESSION_BARGE_IN.script,
-    useTool: SESSION_BARGE_IN.useTool,
-    bargeInAtMs: SESSION_BARGE_IN.bargeInAtMs,
-    injectBargeInFrames: SESSION_BARGE_IN.injectBargeInFrames,
-  },
-};
-
 export type CustomConfig = {
   script: string;
   useTool: boolean;
@@ -60,7 +45,10 @@ export type CustomConfig = {
  * "BARGE-IN" -> LISTENING (re-armed). No invented transitions.
  */
 function stateForLine(line: string): PipelineState | null {
-  if (/BARGE-IN:/.test(line)) return "LISTENING";
+  // BUG-10: the engine log no longer has a colon ("BARGE-IN cancel TTS…"),
+  // so match the bare token — /BARGE-IN:/ would never match and the
+  // re-armed LISTENING transition would be lost.
+  if (/BARGE-IN/.test(line)) return "LISTENING";
   if (/LLM first token/.test(line)) return "SPEAKING";
   if (/tool call fired/.test(line) || /LLM call fired/.test(line)) return "THINKING";
   if (/TURN COMPLETE/.test(line)) return "WAITING";
@@ -79,6 +67,7 @@ function parseLine(line: string): { simMs: number; name: string; payload: string
 function transcriptForLine(
   line: string,
   simMs: number,
+  toolResult: string | null,
 ): Omit<TranscriptLine, "id" | "streaming"> | null {
   // Transcript is built from VERBATIM frame content only — nothing invented.
   let m = /TURN COMPLETE \(score=[\d.]+\) partial='(.*)'/.exec(line);
@@ -87,8 +76,19 @@ function transcriptForLine(
   if (m) return { role: "assistant", text: `\u201c${m[1]}\u201d`, simMs };
   m = /tool result: (.*)$/.exec(line);
   if (m) return { role: "assistant", text: `weather.tokyo_tomorrow \u2192 ${m[1]}`, simMs };
-  if (/TTS first audio-out/.test(line))
-    return { role: "assistant", text: "(assistant speaking)", simMs };
+  if (/TTS first audio-out/.test(line)) {
+    // BUG-9: "(assistant speaking)" was a static placeholder. The engine
+    // never scripts the reply text, so the only verbatim spoken content
+    // available is the tool result the assistant just fetched — quote it.
+    // With no tool result there is nothing verbatim to quote; say so
+    // honestly instead of inventing a reply.
+    if (toolResult) return { role: "assistant", text: `\u201c${toolResult}\u201d`, simMs };
+    return {
+      role: "assistant",
+      text: "(simulated speech \u2014 no scripted reply in engine)",
+      simMs,
+    };
+  }
   return null;
 }
 
@@ -96,11 +96,9 @@ let idCounter = 0;
 
 export function useSession() {
   const [preset, setPreset] = useState<SessionPreset>("clean");
-  const [custom, setCustom] = useState<CustomConfig>({
-    script: "what is the weather in tokyo tomorrow",
-    useTool: true,
-    bargeInMs: 0,
-  });
+  // Seeded from the clean preset so the panel always shows the values the
+  // next run will actually use (BUG-8: preset select re-syncs this).
+  const [custom, setCustom] = useState<CustomConfig>(() => customConfigForPreset("clean"));
   const [running, setRunning] = useState(false);
   const [pipeline, setPipeline] = useState<PipelineState>("IDLE");
   const [stageStamps, setStageStamps] = useState<StageStamp[]>([]);
@@ -113,6 +111,9 @@ export function useSession() {
   const runId = useRef(0);
   const timerRef = useRef<number | null>(null);
   const lastEventId = useRef(-1);
+  // Latest verbatim tool result in this run — quoted as the assistant's
+  // spoken line at TTS first audio-out (BUG-9). Reset on every start.
+  const toolResultRef = useRef<string | null>(null);
 
   const stopTimer = () => {
     if (timerRef.current !== null) {
@@ -141,20 +142,20 @@ export function useSession() {
       runId.current += 1;
       const myRun = runId.current;
 
-      let params: StreamParams;
-      if (active === "custom") {
-        params = {
-          script: custom.script,
-          useTool: custom.useTool,
-          bargeInAtMs: custom.bargeInMs > 0 ? custom.bargeInMs : null,
-          // The original barge-in trick (8 speech frames injected so the
-          // interruption actually fires) is the engine's own verbatim
-          // behavior, recomputed per script by injectBargeInSpeech.
-          injectBargeInFrames: custom.bargeInMs > 0,
-        };
-      } else {
-        params = PRESET_PARAMS[active];
-      }
+      // The engine always runs from ONE config. The Custom preset uses the
+      // panel's live values; clean/barge-in use the preset's synced values
+      // (customConfigForPreset), computed synchronously so ?autostart= and
+      // programmatic starts can never run stale panel state.
+      // BUG-7: the barge-in slider (bargeInMs) IS the barge-in schedule for
+      // every preset — >0 interrupts at that exact ms (the engine injects
+      // speech there), 0 suppresses barge-in entirely.
+      const cfg = active === "custom" ? custom : customConfigForPreset(active);
+      const params: StreamParams = {
+        script: cfg.script,
+        useTool: cfg.useTool,
+        bargeInAtMs: cfg.bargeInMs > 0 ? cfg.bargeInMs : null,
+        injectBargeInFrames: cfg.bargeInMs > 0,
+      };
 
       setRunning(true);
       setPipeline("IDLE");
@@ -165,6 +166,7 @@ export function useSession() {
       setTick(0);
       setElapsedMs(0);
       lastEventId.current = -1;
+      toolResultRef.current = null;
       startWall.current = performance.now();
       stopTimer();
       timerRef.current = window.setInterval(() => {
@@ -195,7 +197,10 @@ export function useSession() {
             setPipeline(next);
             setStageStamps((st) => [...st, { state: next, simMs }]);
           }
-          const tl = transcriptForLine(frame.line, simMs);
+          // Capture the verbatim tool result so the TTS line can quote it.
+          const trm = /tool result: (.*)$/.exec(frame.line);
+          if (trm) toolResultRef.current = trm[1];
+          const tl = transcriptForLine(frame.line, simMs, toolResultRef.current);
           if (tl) {
             setTranscript((ts) => {
               const cleared = ts.map((t) => ({ ...t, streaming: false }));

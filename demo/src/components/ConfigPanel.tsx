@@ -1,5 +1,10 @@
 import { useMemo } from "react";
 import type { CustomConfig } from "../hooks/useSession.ts";
+import {
+  scriptedBargeInAnchorMs,
+  effectiveBargeInFireMs,
+  maxBargeInMs,
+} from "../engine/sessions.ts";
 
 type ConfigPanelProps = {
   config: CustomConfig;
@@ -8,27 +13,23 @@ type ConfigPanelProps = {
 };
 
 /**
- * Deterministic frame math from engine/vad.ts synthCall (noise=0, as the
- * engine calls it): frames.length = 6 + 16*words + 110, one frame = 20ms.
- * The engine's injectBargeInSpeech anchors interruption speech 8 frames from
- * the end, firing at anchorT. Shown honestly so the slider is meaningful.
- */
-function anchorWindow(script: string): { anchorMs: number; windowEndMs: number } {
-  const words = script.trim().split(/\s+/).filter(Boolean).length;
-  const anchorIdx = 6 + 16 * words + 110 - 20;
-  const anchorMs = anchorIdx * 20;
-  return { anchorMs, windowEndMs: anchorMs + 140 };
-}
-
-/**
  * Config panel (DESIGN.md §8.7, shadcn-style): prompt-script text input,
  * weather-tool toggle, barge-in time slider (ms). Editing anything routes
  * the next run to the Custom preset. Slider honors the engine's real
  * interruption anchor — the effective window is displayed, not hidden.
  */
 export function ConfigPanel({ config, running, onChange }: ConfigPanelProps) {
-  const { anchorMs, windowEndMs } = useMemo(() => anchorWindow(config.script), [config.script]);
-  const sliderMax = anchorMs + 1000;
+  // BUG-11: every number here comes from the engine itself — never a
+  // duplicated formula. anchorMs is the scripted interruption point,
+  // effMs is the REAL time the engine will fire at for this slider value
+  // (null = off), and the slider max is clamped to the range the engine
+  // can honor exactly (8 injected frames must fit in the session).
+  const anchorMs = useMemo(() => scriptedBargeInAnchorMs(config.script), [config.script]);
+  const effMs = useMemo(
+    () => effectiveBargeInFireMs(config.script, config.bargeInMs),
+    [config.script, config.bargeInMs],
+  );
+  const sliderMax = useMemo(() => maxBargeInMs(config.script), [config.script]);
   const fill = config.bargeInMs > 0 ? Math.min(100, (config.bargeInMs / sliderMax) * 100) : 0;
 
   const set = (patch: Partial<CustomConfig>) => onChange({ ...config, ...patch });
@@ -86,7 +87,7 @@ export function ConfigPanel({ config, running, onChange }: ConfigPanelProps) {
                   Barge-in at
                 </label>
                 <span className="text-mono text-secondary">
-                  {config.bargeInMs === 0 ? "off" : `${config.bargeInMs}ms`}
+                  {effMs === null ? "off" : `${effMs}ms`}
                 </span>
               </div>
               <input
@@ -106,12 +107,27 @@ export function ConfigPanel({ config, running, onChange }: ConfigPanelProps) {
                 aria-label="Barge-in time in milliseconds, 0 for off"
               />
               <p className="text-caption mt-2" style={{ color: "var(--fg-muted)" }}>
-                The engine injects 8 speech frames near the session end; interruption
-                fires inside{" "}
-                <span className="text-mono" style={{ color: "var(--fg-tertiary)" }}>
-                  {anchorMs}&ndash;{windowEndMs}ms
-                </span>{" "}
-                for this script. The real fire time is read from the BARGE-IN event.
+                {effMs !== null ? (
+                  <>
+                    The engine injects 8 speech frames at{" "}
+                    <span className="text-mono" style={{ color: "var(--fg-tertiary)" }}>
+                      {effMs}ms
+                    </span>{" "}
+                    (span {effMs}&ndash;{effMs + 140}ms); interruption fires then,
+                    but only while the assistant is responding. The real fire
+                    time is read from the BARGE-IN event.
+                  </>
+                ) : (
+                  <>
+                    Barge-in is <strong>off</strong> &mdash; the session runs
+                    uninterrupted. The scripted interruption point for this
+                    script is{" "}
+                    <span className="text-mono" style={{ color: "var(--fg-tertiary)" }}>
+                      {anchorMs}ms
+                    </span>
+                    ; drag the slider there to interrupt the response.
+                  </>
+                )}
               </p>
             </div>
           </div>

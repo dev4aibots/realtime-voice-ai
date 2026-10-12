@@ -23,8 +23,9 @@ function fmt(ms: number): string {
 
 /**
  * Transport bar (DESIGN.md §8.2 — Spotify Now Playing idiom): sticky bottom
- * bar, --bg-elevated, circular green push-to-talk, session select, timer.
- * The mic button drives the REAL pipeline states via the engine stream.
+ * bar, --bg-elevated, circular green session button, session select, timer.
+ * The button starts/stops the simulated session on click (it is NOT a
+ * press-and-hold push-to-talk — there is no microphone); the label says so.
  */
 export function TransportBar({ running, preset, elapsedMs, onToggle, onPreset, onReset }: TransportBarProps) {
   return (
@@ -42,11 +43,13 @@ export function TransportBar({ running, preset, elapsedMs, onToggle, onPreset, o
         className="mx-auto flex items-center gap-4 px-4 md:px-8"
         style={{ maxWidth: "var(--container-max)", height: 76 }}
       >
-        {/* Circular green push-to-talk (play/pause idiom) */}
+        {/* Circular green session button (play/stop idiom). Click to
+            start/stop — not press-and-hold; the label is honest about it. */}
         <button
           type="button"
           onClick={onToggle}
-          aria-label={running ? "Stop session" : "Start session (push to talk)"}
+          aria-label={running ? "Stop session" : "Start session"}
+          title={running ? "Stop session" : "Start session"}
           aria-pressed={running}
           className="rounded-circle flex items-center justify-center flex-none"
           style={{
