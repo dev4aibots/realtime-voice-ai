@@ -1,0 +1,313 @@
+/* DESIGN.md tokens — realtime-voice-ai (Spotify-exact).
+   Core rule: components use these semantic tokens only. Every hex traces to
+   the token provenance table in DESIGN.md §1. Dark-only product. */
+
+:root {
+  /* 1. Color tokens */
+  --bg-canvas: #121212;
+  --bg-card: #181818;
+  --bg-interactive: #1f1f1f;
+  --bg-elevated: #282828;
+  --bg-brand-black: #191414;
+  --bg-pure: #000000;
+  --accent-brand: #1db954;
+  --accent-functional: #1ed760;
+  --accent-hover: #1fdf64;
+  --accent-on: #000000;
+  --fg-primary: #ffffff;
+  --fg-secondary: #b3b3b3;
+  --fg-tertiary: #a7a7a7;
+  --fg-muted: #6a6a6a;
+  --fg-disabled: #535353;
+  --border-hairline: #404040;
+  --surface-variant: #1a1a1a;
+  --light-pill: #eeeeee;
+  --light-pill-fg: #181818;
+  --aurora-wash: rgba(30, 215, 96, 0.1);
+
+  /* 2. Typography */
+  --font-ui: "Inter", "Helvetica Neue", Helvetica, Arial, "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN", Meiryo, "MS Gothic", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --text-display: 700 48px/1.05 var(--font-ui);
+  --text-title: 700 28px/1.15 var(--font-ui);
+  --text-h3: 700 20px/1.3 var(--font-ui);
+  --text-body: 400 15px/1.55 var(--font-ui);
+  --text-body-strong: 600 15px/1.55 var(--font-ui);
+  --text-caption: 500 13px/1.4 var(--font-ui);
+  --text-eyebrow: 700 11px/1.4 var(--font-ui);
+  --text-button: 700 14px/1.4 var(--font-ui);
+  --text-mono-xl: 600 34px/1.2 var(--font-mono);
+  --text-mono: 500 13px/1.5 var(--font-mono);
+  --text-mono-micro: 400 11px/1.5 var(--font-mono);
+
+  /* 3. Spacing (8-pt grid, 4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --section-gap: 64px;
+  --container-max: 1200px;
+  --stack-gap: var(--space-4);
+  --control-pad-x: 32px;
+  --control-pad-y: 14px;
+
+  /* 4. Shape */
+  --radius-pill: 9999px;
+  --radius-circle: 50%;
+  --radius-card: 8px;
+  --radius-panel: 16px;
+  --radius-sm: 4px;
+
+  /* 5. Shadows & elevation */
+  --shadow-spotify: 0 2px 4px 0 rgb(0 0 0 / 20%);
+  --shadow-card: 0 2px 4px 0 rgb(0 0 0 / 20%);
+  --shadow-panel: 0 8px 24px 0 rgb(0 0 0 / 40%);
+  --shadow-float: 0 16px 48px 0 rgb(0 0 0 / 60%);
+  --shadow-green-glow: 0 0 60px -12px rgba(30, 215, 96, 0.45);
+
+  --z-bg: -1;
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-overlay: 50;
+  --z-modal: 100;
+
+  /* 6. Motion */
+  --motion-duration-micro: 100ms;
+  --motion-duration-short: 200ms;
+  --motion-duration-medium: 300ms;
+  --motion-duration-long: 500ms;
+  --motion-easing-hover: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-easing-enter: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --motion-easing-linear: linear;
+  --motion-transition-hover: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+  background-color: var(--bg-canvas);
+  color: var(--fg-primary);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-canvas);
+}
+
+::selection {
+  background: var(--accent-functional);
+  color: var(--accent-on);
+}
+
+/* Type shorthand utilities (DESIGN.md §2: MUST use `font: var(...)`) */
+.text-display { font: var(--text-display); letter-spacing: -0.02em; }
+.text-title { font: var(--text-title); letter-spacing: -0.01em; }
+.text-h3 { font: var(--text-h3); }
+.text-body { font: var(--text-body); }
+.text-body-strong { font: var(--text-body-strong); }
+.text-caption { font: var(--text-caption); color: var(--fg-secondary); }
+.text-eyebrow {
+  font: var(--text-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--fg-secondary);
+}
+.text-button { font: var(--text-button); text-transform: uppercase; letter-spacing: 1.4px; }
+.text-mono-xl { font: var(--text-mono-xl); font-variant-numeric: tabular-nums; }
+.text-mono { font: var(--text-mono); font-variant-numeric: tabular-nums; }
+.text-mono-micro {
+  font: var(--text-mono-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Golden example — the green play/CTA button (DESIGN.md §7, all 5 states) */
+.btn-primary {
+  background-color: var(--accent-functional);
+  color: var(--accent-on);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding-block: var(--control-pad-y);
+  padding-inline: var(--control-pad-x);
+  font: var(--text-button);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-transition-hover),
+    box-shadow var(--motion-transition-hover),
+    transform var(--motion-transition-hover);
+}
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  box-shadow: var(--shadow-green-glow);
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--fg-primary);
+  outline-offset: 3px;
+}
+.btn-primary:active {
+  background-color: var(--accent-brand);
+  transform: scale(0.97);
+}
+.btn-primary:disabled {
+  background-color: var(--fg-disabled);
+  color: var(--bg-canvas);
+  cursor: not-allowed;
+}
+
+/* Ghost / outline pill (secondary actions) */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--fg-primary);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-pill);
+  padding-block: var(--control-pad-y);
+  padding-inline: var(--control-pad-x);
+  font: var(--text-button);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-transition-hover),
+    color var(--motion-transition-hover),
+    transform var(--motion-transition-hover);
+}
+.btn-ghost:hover { border-color: var(--fg-primary); }
+.btn-ghost:focus-visible { outline: 2px solid var(--fg-primary); outline-offset: 3px; }
+.btn-ghost:active { transform: scale(0.97); }
+.btn-ghost:disabled { color: var(--fg-disabled); border-color: var(--fg-disabled); cursor: not-allowed; }
+
+/* Electric-dark slider: 6px track, green fill, 22px green thumb */
+input[type="range"].slider-spotify {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    to right,
+    var(--accent-functional) 0%,
+    var(--accent-functional) var(--fill, 50%),
+    var(--bg-elevated) var(--fill, 50%),
+    var(--bg-elevated) 100%
+  );
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"].slider-spotify::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-circle);
+  background: var(--accent-functional);
+  border: none;
+  transition: transform var(--motion-duration-micro) var(--motion-easing-hover);
+}
+input[type="range"].slider-spotify::-webkit-slider-thumb:hover { transform: scale(1.1); }
+input[type="range"].slider-spotify::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-circle);
+  background: var(--accent-functional);
+  border: none;
+}
+input[type="range"].slider-spotify:focus-visible {
+  outline: 2px solid var(--fg-primary);
+  outline-offset: 3px;
+}
+
+/* Toggle switch (Spotify-style) */
+.toggle-spotify {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-hairline);
+  cursor: pointer;
+  transition: background-color var(--motion-transition-hover);
+  flex: none;
+}
+.toggle-spotify[data-on="true"] { background: var(--accent-functional); border-color: var(--accent-functional); }
+.toggle-spotify::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-circle);
+  background: var(--fg-primary);
+  transition: transform var(--motion-duration-short) var(--motion-easing-hover);
+}
+.toggle-spotify[data-on="true"]::after { transform: translateX(20px); background: var(--accent-on); }
+.toggle-spotify:focus-visible { outline: 2px solid var(--fg-primary); outline-offset: 3px; }
+
+/* Text input (interactive surface) */
+.input-spotify {
+  background: var(--bg-interactive);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-card);
+  color: var(--fg-primary);
+  padding: var(--space-3) var(--space-4);
+  font: var(--text-body);
+  width: 100%;
+  transition: border-color var(--motion-transition-hover);
+}
+.input-spotify::placeholder { color: var(--fg-muted); }
+.input-spotify:focus { outline: none; border-color: var(--accent-functional); }
+.input-spotify:focus-visible { outline: 2px solid var(--fg-primary); outline-offset: 1px; }
+
+/* Select (native, themed) */
+.select-spotify {
+  background: var(--bg-interactive);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-pill);
+  color: var(--fg-primary);
+  padding: var(--space-2) var(--space-4);
+  font: var(--text-caption);
+  cursor: pointer;
+}
+.select-spotify:focus-visible { outline: 2px solid var(--fg-primary); outline-offset: 3px; }
+
+/* Event rows fade-slide in 200ms (DESIGN.md §6) */
+@keyframes event-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.event-row { animation: event-in var(--motion-duration-short) var(--motion-easing-enter); }
+
+/* Live dot: 1.6s linear pulse (DESIGN.md §6) */
+@keyframes live-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+.live-dot { animation: live-pulse 1.6s var(--motion-easing-linear) infinite; }
+
+/* Aurora drift (hero anchor, ambient only) */
+@keyframes aurora-drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(6%, -8%) scale(1.15); }
+}
+@keyframes aurora-drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1.1); }
+  50% { transform: translate(-7%, 6%) scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary, .btn-ghost, .input-spotify, .select-spotify,
+  input[type="range"].slider-spotify::-webkit-slider-thumb,
+  .toggle-spotify, .toggle-spotify::after {
+    transition: none;
+  }
+  .event-row { animation: none; }
+  .live-dot { animation: none; opacity: 1; }
+  .aurora-animated { animation: none !important; }
+}
