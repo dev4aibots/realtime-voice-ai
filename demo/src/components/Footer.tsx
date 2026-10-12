@@ -14,12 +14,11 @@ export function Footer() {
       >
         <div>
           <p className="text-body-strong text-primary">realtime-voice-ai</p>
-          <p className="text-caption mt-2" style={{ maxWidth: 560 }}>
-            A fully simulated voice-AI pipeline demo: synthetic 20ms frames,
-            heuristic turn scoring, deterministic latencies. No audio is
-            captured, no network calls are made, no models run &mdash; the
-            &ldquo;session&rdquo; is the engine&rsquo;s event stream, rendered
-            frame by frame.
+          <p className="text-caption mt-2" style={{ maxWidth: "58ch" }}>
+            A fully pretend voice pipeline: synthetic 20ms frames, heuristic
+            turn scoring, fixed timings. No audio is captured, no network
+            calls are made, no models run. The &ldquo;session&rdquo; is the
+            engine&rsquo;s event stream, drawn frame by frame.
           </p>
         </div>
         <div className="flex flex-col gap-2 md:items-end">
@@ -33,8 +32,7 @@ export function Footer() {
             dev4aibots/realtime-voice-ai
           </a>
           <p className="text-mono-micro" style={{ color: "var(--fg-muted)" }}>
-            Aurora-style hero motion: original implementation; react-bits (MIT +
-            Commons Clause) used as API reference
+            hero motion: original code; react-bits (MIT + Commons Clause) as API reference
           </p>
         </div>
       </div>

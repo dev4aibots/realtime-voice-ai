@@ -36,7 +36,12 @@ export function ConfigPanel({ config, running, onChange }: ConfigPanelProps) {
 
   return (
     <section aria-label="Session configuration">
-      <h2 className="text-title text-primary mb-4">Configure</h2>
+      <div className="flex items-baseline justify-between mb-4">
+        <h2 className="text-title text-primary">Tune the session</h2>
+        <span className="text-mono-micro hidden sm:inline" style={{ color: "var(--fg-muted)" }}>
+          changes apply to the next run
+        </span>
+      </div>
       <div
         className="rounded-card p-6"
         style={{ background: "var(--bg-card)", boxShadow: "var(--shadow-card)" }}
@@ -44,7 +49,7 @@ export function ConfigPanel({ config, running, onChange }: ConfigPanelProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="cfg-script" className="text-eyebrow block mb-3">
-              Say to the assistant
+              What you say to it
             </label>
             <input
               id="cfg-script"
@@ -57,23 +62,23 @@ export function ConfigPanel({ config, running, onChange }: ConfigPanelProps) {
               aria-label="Prompt script"
             />
             <p className="text-caption mt-2" style={{ color: "var(--fg-muted)" }}>
-              The engine synthesizes 20ms frames for this script &mdash; no microphone.
+              The engine builds 20ms frames from these words &mdash; there is no microphone.
             </p>
           </div>
 
           <div className="flex flex-col" style={{ gap: "var(--space-6)" }}>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-body-strong text-primary">Weather tool</p>
+                <p className="text-body-strong text-primary">Check the weather</p>
                 <p className="text-caption mt-1">
-                  weather.tokyo_tomorrow &middot; 420ms latency &middot; filler at +300ms
+                  weather.tokyo_tomorrow &middot; answers in 420ms &middot; filler at +300ms
                 </p>
               </div>
               <button
                 type="button"
                 role="switch"
                 aria-checked={config.useTool}
-                aria-label="Weather tool"
+                aria-label="Check the weather tool"
                 className="toggle-spotify"
                 data-on={config.useTool}
                 disabled={running}
@@ -84,7 +89,7 @@ export function ConfigPanel({ config, running, onChange }: ConfigPanelProps) {
             <div>
               <div className="flex items-baseline justify-between mb-3">
                 <label htmlFor="cfg-barge" className="text-eyebrow">
-                  Barge-in at
+                  Interrupt it at
                 </label>
                 <span className="text-mono text-secondary">
                   {effMs === null ? "off" : `${effMs}ms`}
@@ -104,7 +109,7 @@ export function ConfigPanel({ config, running, onChange }: ConfigPanelProps) {
                   set({ bargeInMs: v === 0 ? 0 : v });
                 }}
                 style={{ ["--fill" as string]: `${fill}%` }}
-                aria-label="Barge-in time in milliseconds, 0 for off"
+                aria-label="Interrupt time in milliseconds, 0 for off"
               />
               <p className="text-caption mt-2" style={{ color: "var(--fg-muted)" }}>
                 {effMs !== null ? (

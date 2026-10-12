@@ -1,19 +1,9 @@
-import type { SessionPreset } from "../hooks/useSession.ts";
-
 type TransportBarProps = {
   running: boolean;
-  preset: SessionPreset;
   elapsedMs: number;
   onToggle: () => void;
-  onPreset: (p: SessionPreset) => void;
   onReset: () => void;
 };
-
-const PRESET_OPTIONS: { value: SessionPreset; label: string }[] = [
-  { value: "clean", label: "Session 1 \u00b7 clean call" },
-  { value: "barge-in", label: "Session 2 \u00b7 barge-in" },
-  { value: "custom", label: "Custom" },
-];
 
 function fmt(ms: number): string {
   const s = Math.floor(ms / 1000);
@@ -22,12 +12,14 @@ function fmt(ms: number): string {
 }
 
 /**
- * Transport bar (DESIGN.md §8.2 — Spotify Now Playing idiom): sticky bottom
- * bar, --bg-elevated, circular green session button, session select, timer.
- * The button starts/stops the simulated session on click (it is NOT a
- * press-and-hold push-to-talk — there is no microphone); the label says so.
+ * Transport bar (redesign 2026-10-12, Spotify Now Playing idiom): sticky
+ * bottom bar, --bg-elevated, circular green session button, reset, session
+ * timer in mono. The preset picker now lives in the "Pick a session" snap
+ * rail above; this bar is pure transport. The circular button starts/stops
+ * the simulated session on click (it is NOT a press-and-hold push-to-talk:
+ * there is no microphone); the label says so.
  */
-export function TransportBar({ running, preset, elapsedMs, onToggle, onPreset, onReset }: TransportBarProps) {
+export function TransportBar({ running, elapsedMs, onToggle, onReset }: TransportBarProps) {
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-overlay"
@@ -44,7 +36,7 @@ export function TransportBar({ running, preset, elapsedMs, onToggle, onPreset, o
         style={{ maxWidth: "var(--container-max)", height: 76 }}
       >
         {/* Circular green session button (play/stop idiom). Click to
-            start/stop — not press-and-hold; the label is honest about it. */}
+            start/stop, not press-and-hold; the label is honest about it. */}
         <button
           type="button"
           onClick={onToggle}
@@ -76,25 +68,6 @@ export function TransportBar({ running, preset, elapsedMs, onToggle, onPreset, o
             </svg>
           )}
         </button>
-
-        {/* Session select */}
-        <label className="text-eyebrow hidden sm:block" htmlFor="session-select">
-          Session
-        </label>
-        <select
-          id="session-select"
-          className="select-spotify"
-          value={preset}
-          onChange={(e) => onPreset(e.target.value as SessionPreset)}
-          disabled={running}
-          aria-label="Session preset"
-        >
-          {PRESET_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value} style={{ background: "var(--bg-elevated)" }}>
-              {o.label}
-            </option>
-          ))}
-        </select>
 
         <button
           type="button"

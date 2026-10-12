@@ -21,7 +21,12 @@ export function EventTimeline({ events }: EventTimelineProps) {
 
   return (
     <section aria-label="Session events" className="flex flex-col min-h-0">
-      <h2 className="text-title text-primary mb-4">Event stream</h2>
+      <div className="flex items-baseline justify-between mb-4">
+        <h2 className="text-title text-primary">Event stream</h2>
+        <span className="text-mono-micro hidden sm:inline" style={{ color: "var(--fg-muted)" }}>
+          every frame, as it happens
+        </span>
+      </div>
       <div
         ref={scrollRef}
         role="log"
@@ -36,9 +41,13 @@ export function EventTimeline({ events }: EventTimelineProps) {
         }}
       >
         {events.length === 0 ? (
-          <p className="text-caption" style={{ color: "var(--fg-muted)" }}>
-            No events yet &mdash; start a session to watch the pipeline emit.
-          </p>
+          <div className="flex flex-col items-start gap-3 py-6" style={{ maxWidth: "40ch" }}>
+            <p className="text-h3 text-primary">No events yet</p>
+            <p className="text-caption">
+              Press Start session and every step the engine takes lands here,
+              live, in the order it happens.
+            </p>
+          </div>
         ) : (
           <ol className="flex flex-col" style={{ gap: "var(--space-2)" }}>
             {events.map((e) => (

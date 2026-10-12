@@ -1,34 +1,38 @@
 import { Aurora } from "./ui/aurora.tsx";
+import { WaveformStage } from "./Waveform.tsx";
+import type { PipelineState } from "../hooks/useSession.ts";
 
 type HeroProps = {
   running: boolean;
   turnLatencyMs: number | null;
+  tick: number;
+  pipeline: PipelineState;
   onStart: () => void;
   onStop: () => void;
 };
 
 /**
- * Session hero (DESIGN.md §8.1): brand-black -> canvas panel, ONE Aurora
- * anchor at 12% opacity with green colorStops, pulsing live dot, display
- * headline, green pill CTA, live end-to-end latency readout, and the
- * SIMULATED PIPELINE honesty badge.
+ * Session hero (redesign 2026-10-12, direction §7.5): the waveform STAGE is
+ * the hero moment — one Aurora anchor at ≤12% opacity, Sora display headline
+ * "Talk to it. It talks back — instantly.", a 10-second story up top, and the
+ * live answer-speed readout. The SIMULATED PIPELINE honesty badge stays.
  */
-export function Hero({ running, turnLatencyMs, onStart, onStop }: HeroProps) {
+export function Hero({ running, turnLatencyMs, tick, pipeline, onStart, onStop }: HeroProps) {
   return (
     <header
       className="relative overflow-hidden rounded-panel"
       style={{
-        background: "linear-gradient(180deg, var(--bg-brand-black) 0%, var(--bg-canvas) 100%)",
+        background: "var(--bg-brand-black)",
         border: "1px solid var(--border-hairline)",
         boxShadow: "var(--shadow-panel)",
-        // Establish a stacking context so the Aurora anchor (z-bg: -1)
-        // paints above this panel's own background, not behind it.
+        // Stacking context so the Aurora anchor (z-bg: -1) paints above this
+        // panel's own background, not behind it.
         isolation: "isolate",
       }}
     >
-      <Aurora colorStops={["#1ed760", "#1db954", "#191414"]} amplitude={1.1} speed={0.5} opacity={0.12} />
+      <Aurora colorStops={["#1db954", "#1ed760", "#191414"]} amplitude={1.1} speed={0.5} opacity={0.12} />
 
-      <div className="relative z-base px-8 md:px-12 py-12 md:py-16" style={{ maxWidth: "var(--container-max)" }}>
+      <div className="relative z-base px-6 md:px-12 pt-10 md:pt-14 pb-8" style={{ maxWidth: "var(--container-max)" }}>
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <span className="flex items-center gap-2">
             <span
@@ -46,18 +50,18 @@ export function Hero({ running, turnLatencyMs, onStart, onStop }: HeroProps) {
               background: "var(--bg-pure)",
             }}
           >
-            Simulated pipeline &mdash; no real audio / models
+            Simulated pipeline &mdash; no real audio or models
           </span>
         </div>
 
-        <h1 className="text-display text-primary" style={{ maxWidth: 720 }}>
-          A voice assistant, thinking out loud.
+        <h1 className="text-display text-primary" style={{ maxWidth: "22ch" }}>
+          Talk to it. It talks back &mdash; instantly.
         </h1>
-        <p className="text-body text-secondary mt-4" style={{ maxWidth: 640 }}>
-          Watch a simulated low-latency voice pipeline run its full turn:
-          VAD detects speech, the turn-taking state machine yields, the LLM
-          streams, and TTS answers &mdash; every event rendered live from the
-          real engine frames.
+        <p className="text-body text-secondary mt-4" style={{ maxWidth: "58ch" }}>
+          A pretend voice assistant that runs a whole conversation turn right
+          in your browser. Press Start session: it listens to you, thinks out
+          loud, and answers in about 200 milliseconds. Every number below
+          comes straight from the engine.
         </p>
 
         <div className="flex flex-wrap items-center gap-6 mt-8">
@@ -74,9 +78,13 @@ export function Hero({ running, turnLatencyMs, onStart, onStop }: HeroProps) {
             <span className="text-mono-xl text-primary" style={{ fontVariantNumeric: "tabular-nums" }}>
               {turnLatencyMs === null ? "\u2014" : `${turnLatencyMs}ms`}
             </span>
-            <span className="text-eyebrow">end-to-end turn latency</span>
+            <span className="text-eyebrow">answer speed</span>
           </div>
         </div>
+      </div>
+
+      <div className="relative z-base px-6 md:px-12 pb-10 md:pb-12">
+        <WaveformStage tick={tick} pipeline={pipeline} running={running} />
       </div>
     </header>
   );

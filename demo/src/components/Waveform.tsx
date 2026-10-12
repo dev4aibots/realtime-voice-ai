@@ -1,22 +1,23 @@
 import { useEffect, useRef } from "react";
 import type { PipelineState } from "../hooks/useSession.ts";
 
-type WaveformProps = {
+type WaveformStageProps = {
   tick: number;
   pipeline: PipelineState;
   running: boolean;
 };
 
-const BARS = 72;
+const BARS = 96;
 
 /**
- * Waveform / VAD visualizer (DESIGN.md §8.6): canvas bars. Decorative but
- * synced — each delivered engine frame advances one tick and the amplitude
- * envelope follows the REAL pipeline state (tall while LISTENING/SPEAKING,
- * low otherwise). Labeled as a visualization. Frozen under
+ * Waveform STAGE (redesign 2026-10-12, direction §7.5): the hero moment —
+ * a large canvas of accent-green bars on near-black. Decorative but synced:
+ * each delivered engine frame advances one tick and the amplitude envelope
+ * follows the REAL pipeline state (tall while LISTENING/SPEAKING, low
+ * otherwise). Labeled as a visualization. Frozen under
  * prefers-reduced-motion.
  */
-export function Waveform({ tick, pipeline, running }: WaveformProps) {
+export function WaveformStage({ tick, pipeline, running }: WaveformStageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const levelsRef = useRef<number[]>(new Array(BARS).fill(0.04));
 
@@ -60,7 +61,7 @@ export function Waveform({ tick, pipeline, running }: WaveformProps) {
       const x = i * barW + barW * 0.22;
       const y = (h - bh) / 2;
       const isHot = active && i === BARS - 1;
-      ctx.fillStyle = isHot ? "#1ed760" : "rgba(30, 215, 96, 0.55)";
+      ctx.fillStyle = isHot ? "#1db954" : "rgba(29, 185, 84, 0.5)";
       if (typeof ctx.roundRect === "function") {
         ctx.beginPath();
         ctx.roundRect(x, y, barW * 0.56, bh, barW * 0.28);
@@ -72,25 +73,23 @@ export function Waveform({ tick, pipeline, running }: WaveformProps) {
   }, [tick, pipeline, running]);
 
   return (
-    <section aria-label="Audio visualization">
-      <div className="flex items-baseline justify-between mb-4">
-        <h2 className="text-title text-primary">Waveform</h2>
+    <div
+      className="rounded-card px-4 py-4 md:px-6"
+      style={{ background: "var(--bg-pure)", boxShadow: "var(--shadow-card)" }}
+    >
+      <div className="flex items-baseline justify-between mb-2 px-1">
+        <p className="text-eyebrow">Live audio</p>
         <span className="text-mono-micro" style={{ color: "var(--fg-muted)" }}>
-          visualization &mdash; synced to frame ticks
+          visualization &mdash; driven by engine frames
         </span>
       </div>
-      <div
-        className="rounded-card px-4 py-3"
-        style={{ background: "var(--bg-card)", boxShadow: "var(--shadow-card)" }}
-      >
-        <canvas
-          ref={canvasRef}
-          className="w-full"
-          style={{ height: 96, display: "block" }}
-          role="img"
-          aria-label={`Audio level visualization, pipeline state ${pipeline.toLowerCase()}`}
-        />
-      </div>
-    </section>
+      <canvas
+        ref={canvasRef}
+        className="w-full"
+        style={{ height: 148, display: "block" }}
+        role="img"
+        aria-label={`Audio level visualization, pipeline state ${pipeline.toLowerCase()}`}
+      />
+    </div>
   );
 }
