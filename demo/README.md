@@ -1,32 +1,47 @@
-# React + TypeScript + Vite
+# realtime-voice-ai · demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A pretend voice assistant that runs a whole conversation turn right in your
+browser. Press **Start session**: it listens to you, thinks out loud, and
+answers in about 200 milliseconds. Every number on screen comes straight
+from the simulated engine — no microphone, no network calls, no models.
 
-Currently, two official plugins are available:
+## What it shows
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Waveform stage** — live audio visualization driven by engine frames
+- **Pick a session** — snap rail: a clean call, a barge-in (you interrupt
+  mid-answer), or your own custom mix
+- **Answer speed** — the engine's real timings: you stop talking, it starts
+  thinking, it starts answering, and the total answer speed
+- **Pipeline** — the five real states (IDLE → LISTENING → WAITING →
+  THINKING → SPEAKING) as a stepper rail
+- **Event stream** — every engine frame, as it happens
+- **Transcript** — a lyric sheet: the current line in full white with a
+  word-by-word reveal, past lines dimmed
+- **Tune the session** — your script, a weather-tool toggle, and an
+  interrupt-time slider wired to the engine's real interruption anchor
 
-## React Compiler
+## Design
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Spotify-exact dark product language: near-black surfaces, one green accent
+(`#1DB954`), pill-and-circle controls, mono numerals for every timing.
+Type: Sora (display) + Instrument Sans (body) + JetBrains Mono (numerals).
+See [DESIGN.md](../DESIGN.md) for the token contract (also mirrored as
+`demo/DESIGN.md` in the repo).
 
-## Expanding the Oxlint configuration
+## Run it
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev      # local dev
+npm run build    # production build (tsc + vite)
+npm run lint     # oxlint
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Design gates (all must exit 0):
+
+```bash
+# run on a staging copy of src + index.html + public (excludes node_modules/dist)
+anti-slop-check.sh <staging-copy>
+npx stylelint "src/**/*.css"
+npx tailwind-a11y 'src/**/*.{tsx,jsx}'
+```

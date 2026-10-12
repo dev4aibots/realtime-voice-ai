@@ -26,6 +26,7 @@ export default {
         lightpillfg: "var(--light-pill-fg)",
       },
       fontFamily: {
+        display: "var(--font-display)",
         ui: "var(--font-ui)",
         mono: "var(--font-mono)",
       },
