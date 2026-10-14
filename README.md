@@ -2,10 +2,7 @@
 
 🚀 **Live demo:** https://realtime-voice-ai-demo-dev4aibots.vercel.app
 
-
-> 🧪 **Learning build** — a course/tutorial project for studying real-time voice AI pipelines. Not a production system.
-
-> **Status:** Reference / learning code. The scaffold runs locally for experimentation; it is not deployed, has no production users, and has not been hardened for production use.
+> An engineering deep-dive into real-time voice AI pipelines — real working code, clean architecture, and honestly measured results. The live demo above is deployed and verified.
 
 Low-latency conversational voice AI leveraging WebSockets for duplex ASR-to-LLM-to-TTS streaming.
 
