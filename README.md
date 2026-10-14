@@ -1,6 +1,6 @@
 # Realtime Voice AI
 
-🚀 **Live demo:** https://realtime-voice-ai-demo-n69cwelfu-dev4aibots.vercel.app
+🚀 **Live demo:** https://realtime-voice-ai-demo-dev4aibots.vercel.app
 
 
 > 🧪 **Learning build** — a course/tutorial project for studying real-time voice AI pipelines. Not a production system.
