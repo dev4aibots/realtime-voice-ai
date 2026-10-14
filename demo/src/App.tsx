@@ -75,18 +75,34 @@ export default function App() {
     else session.start();
   };
 
+  // The user's own tune-panel edits, kept aside so that selecting the
+  // Custom mix preset restores what THEY typed — not whatever preset values
+  // a different preset left behind in the shared custom slot.
+  const customEditsRef = useRef<typeof session.custom | null>(null);
+
   const handlePreset = (p: SessionPreset) => {
     session.setPreset(p);
     // BUG-8: the Tune panel must show the values the next run will
-    // actually use: sync it from the preset (Custom keeps the user's edits).
-    if (p !== "custom") session.setCustom(customConfigForPreset(p));
+    // actually use: sync it from the preset (Custom restores the user's
+    // last edits instead of stale preset values).
+    if (p === "custom") {
+      if (customEditsRef.current) session.setCustom(customEditsRef.current);
+    } else {
+      session.setCustom(customConfigForPreset(p));
+    }
     session.reset();
   };
 
   const handleConfigChange = (c: typeof session.custom) => {
+    customEditsRef.current = c;
     session.setCustom(c);
     if (session.preset !== "custom") session.setPreset("custom");
   };
+
+  // Interruptions observed live in the event stream, so the metrics strip
+  // can show the count while the session is still running (the summary
+  // frame only lands at the end).
+  const liveBargeIns = session.events.reduce((n, e) => n + (/BARGE-IN/.test(e.raw) ? 1 : 0), 0);
 
   return (
       <div className="min-h-screen bg-canvas text-primary font-ui">
@@ -145,7 +161,7 @@ export default function App() {
           </Reveal>
 
           <Reveal>
-            <MetricsStrip summary={session.summary} />
+            <MetricsStrip summary={session.summary} liveBargeIns={liveBargeIns} />
           </Reveal>
 
           <Reveal>

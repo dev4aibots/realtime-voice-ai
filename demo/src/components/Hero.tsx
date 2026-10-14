@@ -60,7 +60,7 @@ export function Hero({ running, turnLatencyMs, tick, pipeline, onStart, onStop }
         <p className="text-body text-secondary mt-4" style={{ maxWidth: "58ch" }}>
           A pretend voice assistant that runs a whole conversation turn right
           in your browser. Press Start session: it listens to you, thinks out
-          loud, and answers in about 200 milliseconds. Every number below
+          loud, and answers in well under a second. Every number below
           comes straight from the engine.
         </p>
 
@@ -76,7 +76,11 @@ export function Hero({ running, turnLatencyMs, tick, pipeline, onStart, onStop }
           )}
           <div className="flex items-baseline gap-3">
             <span className="text-mono-xl text-primary" style={{ fontVariantNumeric: "tabular-nums" }}>
-              {turnLatencyMs === null ? "\u2014" : `${turnLatencyMs}ms`}
+              {/* The engine reports -1 when no turn produced a valid
+                  measurement (e.g. interrupted before audio-out, or a script
+                  too short to complete a turn). Never leak the sentinel;
+                  show the em dash, like MetricsStrip does. */}
+              {turnLatencyMs === null || turnLatencyMs < 0 ? "\u2014" : `${turnLatencyMs}ms`}
             </span>
             <span className="text-eyebrow">answer speed</span>
           </div>

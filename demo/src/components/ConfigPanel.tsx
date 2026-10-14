@@ -71,7 +71,7 @@ export function ConfigPanel({ config, running, onChange }: ConfigPanelProps) {
               <div>
                 <p className="text-body-strong text-primary">Check the weather</p>
                 <p className="text-caption mt-1">
-                  weather.tokyo_tomorrow &middot; answers in 420ms &middot; filler at +300ms
+                  weather.tokyo_tomorrow &middot; scripted demo tool &middot; answers in 420ms
                 </p>
               </div>
               <button

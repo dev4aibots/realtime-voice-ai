@@ -94,11 +94,41 @@ function transcriptForLine(
 
 let idCounter = 0;
 
+const CONFIG_STORAGE_KEY = "rva-demo-config-v1";
+
+type PersistedConfig = { preset: SessionPreset; custom: CustomConfig };
+
+function loadPersistedConfig(): PersistedConfig | null {
+  try {
+    const raw = window.localStorage.getItem(CONFIG_STORAGE_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as Partial<PersistedConfig>;
+    if (p.preset !== "clean" && p.preset !== "barge-in" && p.preset !== "custom") return null;
+    const c = p.custom;
+    if (!c || typeof c.script !== "string" || typeof c.useTool !== "boolean") return null;
+    return {
+      preset: p.preset,
+      custom: {
+        script: c.script,
+        useTool: c.useTool,
+        bargeInMs: Number.isFinite(c.bargeInMs) && (c.bargeInMs as number) >= 0 ? (c.bargeInMs as number) : 0,
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function useSession() {
-  const [preset, setPreset] = useState<SessionPreset>("clean");
+  // The tune-panel configuration persists across reloads (preset + custom
+  // values together, never one without the other), so a refresh never
+  // silently resets the user's setup.
+  const [preset, setPreset] = useState<SessionPreset>(() => loadPersistedConfig()?.preset ?? "clean");
   // Seeded from the clean preset so the panel always shows the values the
   // next run will actually use (BUG-8: preset select re-syncs this).
-  const [custom, setCustom] = useState<CustomConfig>(() => customConfigForPreset("clean"));
+  const [custom, setCustom] = useState<CustomConfig>(
+    () => loadPersistedConfig()?.custom ?? customConfigForPreset("clean"),
+  );
   const [running, setRunning] = useState(false);
   const [pipeline, setPipeline] = useState<PipelineState>("IDLE");
   const [stageStamps, setStageStamps] = useState<StageStamp[]>([]);
@@ -236,6 +266,18 @@ export function useSession() {
   }, []);
 
   useEffect(() => () => stopTimer(), []);
+
+  // Persist the tune-panel configuration (preset + custom together) so a
+  // page reload restores exactly what the user left, instead of resetting
+  // half the panel.
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify({ preset, custom }));
+    } catch {
+      // Storage unavailable (private mode etc.): the demo works fine
+      // without persistence; just don't crash.
+    }
+  }, [preset, custom]);
 
   return {
     preset,

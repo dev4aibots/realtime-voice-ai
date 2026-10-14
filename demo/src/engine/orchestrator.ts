@@ -99,7 +99,12 @@ export function runSession(frames: AudioChunk[], opts: SessionOptions): Metrics 
           const score = turnCompletionScore(finalPartial);
           if (score >= 0.6) {
             state = "WAITING";
-            m.turnCompleteMs = f.tMs;
+            // First completed turn wins, matching the firstLlmTokenMs /
+            // firstAudioOutMs guards below: a later turn must not overwrite
+            // the timestamps the latency is measured from, otherwise
+            // turnLatencyMs() mixes two turns and can go negative (or the
+            // -1 "no measurement" sentinel leaks when no turn completes).
+            if (m.turnCompleteMs === 0) m.turnCompleteMs = f.tMs;
             log(
               `${f.tMs}ms TURN COMPLETE (score=${score.toFixed(2)}) partial='${finalPartial}'`,
             );

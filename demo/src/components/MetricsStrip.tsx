@@ -2,6 +2,13 @@ import type { SessionSummary } from "../engine/index.ts";
 
 type MetricsStripProps = {
   summary: SessionSummary | null;
+  /**
+   * Barge-ins observed so far in the live event stream. Shown while the
+   * session is still running (before the summary frame lands), so the
+   * INTERRUPTIONS stat reflects interruptions as they happen, not only
+   * after the run completes.
+   */
+  liveBargeIns: number;
 };
 
 function Stat({
@@ -39,8 +46,16 @@ function Stat({
  * no card grid. Wired to the REAL summary frame ({type:"summary"}).
  * "—" until the summary frame lands.
  */
-export function MetricsStrip({ summary }: MetricsStripProps) {
+export function MetricsStrip({ summary, liveBargeIns }: MetricsStripProps) {
   const v = (n: number | undefined) => (n === undefined || n < 0 ? "\u2014" : String(n));
+  // Interruptions: the summary frame is authoritative once the run
+  // completes; while running, count BARGE-IN events live so the stat
+  // updates the moment an interruption fires.
+  const interruptions = summary
+    ? String(summary.bargeIns)
+    : liveBargeIns > 0
+      ? String(liveBargeIns)
+      : "\u2014";
   return (
     <section aria-label="Answer speed metrics">
       <div className="flex items-baseline justify-between mb-4">
@@ -62,7 +77,7 @@ export function MetricsStrip({ summary }: MetricsStripProps) {
           <div style={{ width: 1, background: "var(--border-hairline)" }} aria-hidden="true" />
           <Stat label="Answer speed" value={v(summary?.turnLatencyMs)} unit="ms" highlight />
           <div style={{ width: 1, background: "var(--border-hairline)" }} aria-hidden="true" />
-          <Stat label="Interruptions" value={summary ? String(summary.bargeIns) : "\u2014"} />
+          <Stat label="Interruptions" value={interruptions} />
         </div>
       </div>
     </section>
