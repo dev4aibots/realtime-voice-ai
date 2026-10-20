@@ -42,7 +42,7 @@ export function PresetRail({ preset, running, onPreset }: PresetRailProps) {
           swipe or scroll
         </span>
       </div>
-      <div className="rail" role="group" aria-label="Session preset options">
+      <div className="rail du-rail-fade" role="group" aria-label="Session preset options">
         {PRESET_OPTIONS.map((o) => {
           const isActive = preset === o.value;
           return (

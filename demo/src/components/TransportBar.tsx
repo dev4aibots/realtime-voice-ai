@@ -22,10 +22,10 @@ function fmt(ms: number): string {
 export function TransportBar({ running, elapsedMs, onToggle, onReset }: TransportBarProps) {
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-overlay"
+      className="fixed bottom-0 left-0 right-0 z-overlay du-transport-hairline"
+      data-du-playing={running ? "true" : "false"}
       style={{
         background: "var(--bg-elevated)",
-        borderTop: "1px solid var(--border-hairline)",
         boxShadow: "var(--shadow-float)",
       }}
       role="region"

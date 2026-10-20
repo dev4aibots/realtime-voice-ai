@@ -56,9 +56,12 @@ export function PipelineCards({ pipeline, stamps }: PipelineCardsProps) {
               key={s.state}
               role="listitem"
               aria-current={isActive ? "true" : undefined}
-              className="pb-5"
+              className="pb-5 du-stage-index"
               style={{ minWidth: 180 }}
             >
+              <span className="du-idx" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
               <div className="flex items-center" aria-hidden="true">
                 <span
                   className="rounded-circle flex-none"

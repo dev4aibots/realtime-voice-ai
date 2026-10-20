@@ -74,7 +74,7 @@ export function WaveformStage({ tick, pipeline, running }: WaveformStageProps) {
 
   return (
     <div
-      className="rounded-card px-4 py-4 md:px-6"
+      className={`rounded-card px-4 py-4 md:px-6 du-stage-glow${running ? " du-beam-live" : ""}`}
       style={{ background: "var(--bg-pure)", boxShadow: "var(--shadow-card)" }}
     >
       <div className="flex items-baseline justify-between mb-2 px-1">
