@@ -1,19 +1,19 @@
 # Realtime Voice AI
 
-🚀 **Live demo:** https://realtime-voice-ai-demo-dev4aibots.vercel.app
+**Live demo:** https://realtime-voice-ai-demo-dev4aibots.vercel.app
 
 > An engineering deep-dive into real-time voice AI pipelines — real working code, clean architecture, and honestly measured results. The live demo above is deployed and verified.
 
-Low-latency conversational voice AI leveraging WebSockets for duplex ASR-to-LLM-to-TTS streaming.
+Low-latency conversational voice AI over WebSockets for duplex ASR-to-LLM-to-TTS streaming.
 
-[ Demo ] [ Architecture ] [ API Docs ] [ Evaluation ]
+[Demo](demo.gif) · [Architecture](docs/architecture.md) · [Evaluation](docs/evaluation.md)
 
 ![Terminal Demo](demo.gif)
 
 Python • WebSockets • Whisper • ElevenLabs • VAD
 
 ## What it does
-Low-latency conversational voice AI leveraging WebSockets for duplex ASR-to-LLM-to-TTS streaming. This repository is a learning scaffold — core logic, evaluation harnesses, and example configs for study and experimentation, not hardened for production use.
+Low-latency conversational voice AI over WebSockets for duplex ASR-to-LLM-to-TTS streaming. This repository is a learning scaffold — core logic, evaluation harnesses, and example configs for study and experimentation, not hardened for production use.
 
 ## Execution Trace (Proof of Work)
 
