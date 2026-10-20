@@ -109,6 +109,10 @@ export default function App() {
         {/* Skip link */}
         <a
           href="#main"
+          onClick={() => {
+            // Move keyboard focus into main content, not just the hash/scroll.
+            document.getElementById("main")?.focus();
+          }}
           className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-modal focus:px-4 focus:py-2 focus:rounded-sm"
           style={{ background: "var(--accent-functional)", color: "var(--accent-on)" }}
         >
@@ -140,7 +144,8 @@ export default function App() {
 
         <main
           id="main"
-          className="mx-auto px-4 md:px-8 pt-8 flex flex-col"
+          tabIndex={-1}
+          className="mx-auto px-4 md:px-8 pt-8 flex flex-col outline-none"
           style={{
             maxWidth: "var(--container-max)",
             gap: "var(--section-gap)",
