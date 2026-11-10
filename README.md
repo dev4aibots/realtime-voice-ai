@@ -87,3 +87,8 @@ The `docs/` directory contains deep-dives into the system:
 - `docs/engineering-decisions.md`
 - `docs/evaluation.md`
 - `docs/limitations.md`
+## Proof & Evidence
+
+- Live voice session console deployed at Vercel
+- WebSocket-based low-latency design; latency budget documented
+- Honest boundary: demo console is the interactive surface; production TTS/ASR wiring lives in the repo
